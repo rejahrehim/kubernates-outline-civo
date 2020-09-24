@@ -1,1 +1,1 @@
-# outlne run in kubernates civo
+# Outlne run in Kubernates Civo
