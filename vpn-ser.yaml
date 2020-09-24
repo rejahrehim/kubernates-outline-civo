@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: outline
+  name: shadowbox-server
+  labels:
+    app: shadowbox
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: shadowbox
+  template:
+    metadata:
+      labels:
+        app: shadowbox
+    spec:
+      containers:
+      - name: shadowbox
+        image: rejahrehim/outline:latest
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c", "echo '{\"rollouts\":[{\"id\":\"single-port\",\"enabled\":true}],\"portForNewAccessKeys\":8090}' > /root/shadowbox/persisted-state/shadowbox_server_config.json; cat /opt/outline/shadowbox_config.json > /root/shadowbox/persisted-state/shadowbox_config.json; cat /opt/outline/outline-ss-server/config.yml > /root/shadowbox/persisted-state/outline-ss-server/config.yml; sleep 10; ln -sf /opt/outline/shadowbox_config.json /root/shadowbox/persisted-state/shadowbox_config.json; ln -sf /opt/outline/outline-ss-server/config.yml /root/shadowbox/persisted-state/outline-ss-server/config.yml; var='kill -SIGHUP $(pgrep -f outline-ss-server)'; echo \"*/15 * * * * $var\" > mycron; crontab mycron; rm mycron;"]
+        env:
+        - name: LOG_LEVEL
+          value: "debug"
+        - name: SB_API_PREFIX
+          value: TestApiPrefix
+        - name: SB_CERTIFICATE_FILE
+          value: "/tmp/shadowbox-selfsigned-dev.crt"
+        - name: SB_PRIVATE_KEY_FILE
+          value: "/tmp/shadowbox-selfsigned-dev.key"
+        - name: SB_PUBLIC_IP
+          value: "xxx.xxx.xxx.xxx" #Server LB static IP
+        volumeMounts:
+        - name: shadowbox-config
+          mountPath: /opt/outline
+          readOnly: true
+        - name: server-config-volume
+          mountPath: /cache
+        - name: tls
+          mountPath: /tmp/shadowbox-selfsigned-dev.crt
+          subPath: shadowbox-selfsigned-dev.crt
+        - name: tls
+          mountPath: /tmp/shadowbox-selfsigned-dev.key
+          subPath: shadowbox-selfsigned-dev.key
+        ports:
+        - containerPort: 80
+        - containerPort: 8090
+      volumes:
+      - name: server-config-volume
+        emptyDir: {}
+      - name: shadowbox-config
+        persistentVolumeClaim:
+          claimName: outline-pvc
+      - name: tls
+        secret:
+          secretName: shadowbox-tls
+          items:
+          - key: tls.crt
+            path: shadowbox-selfsigned-dev.crt
+          - key: tls.key
+            path: shadowbox-selfsigned-dev.key
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: shadowbox
+  namespace: outline
+  name: shadowbox-lb-tcp
+spec:
+  type: LoadBalancer
+  loadBalancerIP: "xxx.xxx.xxx.xxx" #Server LB static IP
+  ports:
+  - name: out
+    port: 8090
+    targetPort: 8090
+    protocol: TCP
+  selector:
+    app: shadowbox
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: shadowbox
+  namespace: outline
+  name: shadowbox-lb-udp
+spec:
+  type: LoadBalancer
+  loadBalancerIP: "xxx.xxx.xxx.xxx" #Server LB static IP (GCP)
+  ports:
+  - name: out
+    port: 8090
+    targetPort: 8090
+    protocol: UDP
+  selector:
+    app: shadowbox

@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: outline
+  name: shadowbox-manager
+  labels:
+    app: shadowbox-manager
+spec:
+  initContainers:
+  - name: install
+    image: busybox
+    command: ["/bin/sh"]
+    args: ["-c", "touch /tmp/outline-ss-server/config.yml; echo '{\"rollouts\":[{\"id\":\"single-port\",\"enabled\":true}],\"portForNewAccessKeys\":443}' > /tmp/shadowbox_server_config.json; if [ ! -f /tmp/shadowbox_config.json ]; then echo 'USER CONFIG NOT FOUND'; echo '{\"defaultPort\":443,\"accessKeys\":[],\"nextId\":0}' > /tmp/shadowbox_config.json; fi"]
+    volumeMounts:
+    - name: shadowbox-config
+      mountPath: /tmp
+  containers:
+  - name: shadowbox-manager
+    image: rejahrehim/outline:latest
+    env:
+    - name: LOG_LEVEL
+      value: "debug"
+    - name: SB_API_PREFIX
+      value: TestApiPrefix
+    - name: SB_CERTIFICATE_FILE
+      value: "/tmp/shadowbox-selfsigned-dev.crt"
+    - name: SB_PRIVATE_KEY_FILE
+      value: "/tmp/shadowbox-selfsigned-dev.key"
+    - name: SB_API_PORT
+      value: "8081"
+    - name: SB_PUBLIC_IP
+      value: "xxx.xxx.xxx.xxx" #Server LB static IP 
+    volumeMounts:
+    - name: shadowbox-config
+      mountPath: /root/shadowbox/persisted-state
+    - name: server-config-volume
+      mountPath: /cache
+    - name: tls
+      mountPath: /tmp/shadowbox-selfsigned-dev.crt
+      subPath: shadowbox-selfsigned-dev.crt
+    - name: tls
+      mountPath: /tmp/shadowbox-selfsigned-dev.key
+      subPath: shadowbox-selfsigned-dev.key
+    ports:
+    - containerPort: 80
+    - containerPort: 8081
+  volumes:
+  - name: server-config-volume
+    emptyDir: {}
+  - name: shadowbox-config
+    persistentVolumeClaim:
+      claimName: outline-pvc
+  - name: tls
+    secret:
+      secretName: shadowbox-tls
+      items:
+      - key: tls.crt
+        path: shadowbox-selfsigned-dev.crt
+      - key: tls.key
+        path: shadowbox-selfsigned-dev.key
+  imagePullSecrets:
+  - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: shadowbox-manager
+  namespace: outline
+  name: shadowbox-manager-tcp-service
+spec:
+  type: LoadBalancer
+  loadBalancerIP: "xxx.xxx.xxx.xxx" #Manager LB static IP (GCP)
+  ports:
+  - name: out
+    port: 8081
+    targetPort: 8081
+    protocol: TCP
+  selector:
+    app: shadowbox-manager
