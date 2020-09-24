@@ -1,1 +1,1 @@
-# kubernates-outlane-civo
+# outlne run in kubernates civo
