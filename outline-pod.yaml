@@ -10,7 +10,7 @@ spec:
   - name: install
     image: busybox
     command: ["/bin/sh"]
-    args: ["-c", "touch /tmp/outline-ss-server/config.yml; echo '{\"rollouts\":[{\"id\":\"single-port\",\"enabled\":true}],\"portForNewAccessKeys\":443}' > /tmp/shadowbox_server_config.json; if [ ! -f /tmp/shadowbox_config.json ]; then echo 'USER CONFIG NOT FOUND'; echo '{\"defaultPort\":443,\"accessKeys\":[],\"nextId\":0}' > /tmp/shadowbox_config.json; fi"]
+    args: ["-c", "touch /tmp/outline-ss-server/config.yml; echo '{\"rollouts\":[{\"id\":\"single-port\",\"enabled\":true}],\"portForNewAccessKeys\":8090}' > /tmp/shadowbox_server_config.json; if [ ! -f /tmp/shadowbox_config.json ]; then echo 'USER CONFIG NOT FOUND'; echo '{\"defaultPort\":8090,\"accessKeys\":[],\"nextId\":0}' > /tmp/shadowbox_config.json; fi"]
     volumeMounts:
     - name: shadowbox-config
       mountPath: /tmp
