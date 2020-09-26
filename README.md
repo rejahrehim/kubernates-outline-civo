@@ -9,7 +9,7 @@ Spin up a kubernetes cluster in your civo cloud, note down the cluster name you 
 After the cluster is functional(it may take upto 5 mintues), run the following snippet
 
 ```
-curl -s https://git.io/JUVkD | bash -s <api_key> <cluster_name>
+curl -L -s https://git.io/JUVkD | bash -s <api_key> <cluster_name>
 ```
 
 replace <api_key> and <cluster_name> with your account's api key and cluster name that you have provided.

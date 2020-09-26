@@ -11,6 +11,9 @@ fi
 
 clusterid=`curl -H "Authorization: bearer $token" https://api.civo.com/v2/kubernetes/clusters 2>&1 | grep -oP  {\"id\":\"\([a-zA-Z0-9\-]*\)\",\"name\":\"$clustername\"  | awk -F\",\" '{print $1}'  | awk -F:\" '{print $2}'`
 
+mkdir -p /tmp/civo-outline
+cd /tmp/civo-outline
+
 if [ -z "$clusterid" ]
 then
       echo "No cluster exists with this name"
@@ -21,9 +24,6 @@ else
       curl -H "Authorization: bearer $token" -X PUT https://api.civo.com/v2/kubernetes/clusters/$clusterid -d applications=Longhorn   &> /dev/null
       curl -H "Authorization: bearer $token" https://api.civo.com/v2/kubernetes/clusters/$clusterid 2>&1 | grep -oP  \"kubeconfig\":\"[^\"]*admin | awk -F\"kubeconfig\":\" '{print $2}' > config && sed -i 's/\\n/\n/g' config
 fi
-
-mkdir -p /tmp/civo-outline
-cd /tmp/civo-outline
 
 rm -rf cert/ config kubernates-outline-civo/  &> /dev/null
 
