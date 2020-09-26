@@ -11,7 +11,7 @@ fi
 
 clusterid=`curl -H "Authorization: bearer $token" https://api.civo.com/v2/kubernetes/clusters 2>&1 | grep -oP  {\"id\":\"\([a-zA-Z0-9\-]*\)\",\"name\":\"$clustername\"  | awk -F\",\" '{print $1}'  | awk -F:\" '{print $2}'`
 
-rm -rf cert/ config kubernates-outline-civo/  &> /dev/null
+rm -rf /tmp/civo-outline &> /dev/null
 mkdir -p /tmp/civo-outline
 cd /tmp/civo-outline
 
