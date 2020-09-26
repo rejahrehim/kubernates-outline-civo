@@ -11,6 +11,7 @@ fi
 
 clusterid=`curl -H "Authorization: bearer $token" https://api.civo.com/v2/kubernetes/clusters 2>&1 | grep -oP  {\"id\":\"\([a-zA-Z0-9\-]*\)\",\"name\":\"$clustername\"  | awk -F\",\" '{print $1}'  | awk -F:\" '{print $2}'`
 
+rm -rf cert/ config kubernates-outline-civo/  &> /dev/null
 mkdir -p /tmp/civo-outline
 cd /tmp/civo-outline
 
@@ -22,10 +23,8 @@ then
 else
       echo $clusterid
       curl -H "Authorization: bearer $token" -X PUT https://api.civo.com/v2/kubernetes/clusters/$clusterid -d applications=Longhorn   &> /dev/null
-      curl -H "Authorization: bearer $token" https://api.civo.com/v2/kubernetes/clusters/$clusterid 2>&1 | grep -oP  \"kubeconfig\":\"[^\"]*admin | awk -F\"kubeconfig\":\" '{print $2}' > /tmp/civo-outline/config && sed -i 's/\\n/\n/g' /tmp/civo-outline/config
+      curl -H "Authorization: bearer $token" https://api.civo.com/v2/kubernetes/clusters/$clusterid 2>&1 | grep -oP  \"kubeconfig\":\"[^\"]*admin | awk -F\"kubeconfig\":\" '{print $2}' > config && sed -i 's/\\n/\n/g' config
 fi
-
-rm -rf cert/ config kubernates-outline-civo/  &> /dev/null
 
 git clone --quiet  https://github.com/rejahrehim/kubernates-outline-civo.git
 
