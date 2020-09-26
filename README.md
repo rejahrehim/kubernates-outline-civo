@@ -6,7 +6,7 @@
 Spin up a kubernetes cluster in your civo cloud, note down the cluster name you have provided while creating the cluster. Also get the API Key of your account from [Security Section](https://www.civo.com/account/security)
 
 ### Spin up Outline
-After the cluster is functional(it may take upto 5 mintues), run the following snippet
+**After the cluster is functional(it may take upto 5 mintues), run the following snippet in terminal**
 
 ```
 curl -L -s https://git.io/JUVkD | bash -s <api_key> <cluster_name>
