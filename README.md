@@ -21,7 +21,7 @@ make sure you have satisfied the following dependencies before running the snipp
 * curl
 * openssl
 
-After the script is completed copy the installation output `{"apiUrl":"https://xxx.xxx.xxx.xxx:8081/TestApiPrefix","certSha256":"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}` and make sure to check all containers are up and running before pasting the output to outline manager application.
+After the script is completed copy the installation output `{"apiUrl":"https://xxx.xxx.xxx.xxx:8081/xxxxxxxxxxxxx","certSha256":"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}` and make sure to check all containers are up and running before pasting the output to outline manager application.
 
 To check container status change directory to `/tmp/civo-outline` and run `kubectl get pods --all-namespaces --kubeconfig config`
 

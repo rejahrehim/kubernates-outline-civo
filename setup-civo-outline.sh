@@ -55,9 +55,12 @@ nfsServerIp=`kubectl get svc nfs-server --kubeconfig config  -o jsonpath="{['spe
 sed -i s/xxx.xxx.xxx.xxx/$nfsServerIp/g kubernates-outline-civo/nfs-pv.yaml
 
 kubectl apply -f kubernates-outline-civo/nfs-pv.yaml --kubeconfig config
+apiPrefix=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 
 sed -i s/xxx.xxx.xxx.xxx/$lbIP/g kubernates-outline-civo/vpn-ser.yaml
 sed -i s/xxx.xxx.xxx.xxx/$lbIP/g kubernates-outline-civo/outline-pod.yaml
+sed -i s/TestApiPrefix/$apiPrefix/g kubernates-outline-civo/vpn-ser.yaml
+sed -i s/TestApiPrefix/$apiPrefix/g kubernates-outline-civo/outline-pod.yaml
 
 
 kubectl apply -f kubernates-outline-civo/vpn-ser.yaml --kubeconfig config
@@ -65,7 +68,6 @@ kubectl apply -f kubernates-outline-civo/outline-pod.yaml --kubeconfig config
 
 export SHA=$(openssl x509 -noout -fingerprint  -sha256 -inform pem -in ${SB_CERTIFICATE_FILE} | sed "s/://g" | sed 's/.*=//')
 
-
-echo \{\"apiUrl\":\"https://$lbIP:8081/TestApiPrefix\",\"certSha256\":\"${SHA}\"\}
+echo \{\"apiUrl\":\"https://$lbIP:8081/$apiPrefix\",\"certSha256\":\"${SHA}\"\}
 
 
