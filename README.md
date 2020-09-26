@@ -2,7 +2,7 @@
 
 ## Steps
 
-### Create kubernetes cluster in CIVO
+### Create kubernetes cluster in [CIVO](https://www.civo.com)
 Spin up a kubernetes cluster in your civo cloud, note down the cluster name you have provided while creating the cluster. Also get the API Key of your account from [Security Section](https://www.civo.com/account/security)
 
 ### Spin up Outline
