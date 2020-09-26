@@ -42,23 +42,24 @@ declare -a openssl_req_flags=(
   -out "${SB_CERTIFICATE_FILE}"
 )
 openssl req "${openssl_req_flags[@]}" &> /dev/null 
-kubectl create namespace outline --kubeconfig config
-kubectl create secret tls shadowbox-tls -n outline --key ${SB_PRIVATE_KEY_FILE} --cert ${SB_CERTIFICATE_FILE} --kubeconfig config
-
-kubectl apply -f kubernates-outline-civo/pv.yaml --kubeconfig config
-kubectl apply -f kubernates-outline-civo/pvc.yaml --kubeconfig config
-kubectl apply -f kubernates-outline-civo/nfs-deply.yaml --kubeconfig config
 
 lbIP=`kubectl get svc traefik -n kube-system --kubeconfig config  -o jsonpath="{['status']['loadBalancer']['ingress'][0]['ip']}"`
 subnet=$(echo $lbIP | awk -F. '{print $1}')
 
-while [ $subnet -eq '172' ]
+while [[ $subnet -eq 172 || -z "$subnet" ]]
 do 
       echo "Waiting for API endpoint IP"
       sleep 10
       lbIP=`kubectl get svc traefik -n kube-system --kubeconfig config  -o jsonpath="{['status']['loadBalancer']['ingress'][0]['ip']}"`
       subnet=$(echo $lbIP | awk -F. '{print $1}')
 done
+
+kubectl create namespace outline --kubeconfig config
+kubectl create secret tls shadowbox-tls -n outline --key ${SB_PRIVATE_KEY_FILE} --cert ${SB_CERTIFICATE_FILE} --kubeconfig config
+
+kubectl apply -f kubernates-outline-civo/pv.yaml --kubeconfig config
+kubectl apply -f kubernates-outline-civo/pvc.yaml --kubeconfig config
+kubectl apply -f kubernates-outline-civo/nfs-deply.yaml --kubeconfig config
 
 nfsServerIp=`kubectl get svc nfs-server --kubeconfig config  -o jsonpath="{['spec']['clusterIP']}"`
 
