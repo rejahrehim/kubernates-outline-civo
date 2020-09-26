@@ -50,6 +50,16 @@ kubectl apply -f kubernates-outline-civo/pvc.yaml --kubeconfig config
 kubectl apply -f kubernates-outline-civo/nfs-deply.yaml --kubeconfig config
 
 lbIP=`kubectl get svc traefik -n kube-system --kubeconfig config  -o jsonpath="{['status']['loadBalancer']['ingress'][0]['ip']}"`
+subnet=$(echo $lbIP | awk -F. '{print $1}')
+
+while [ $subnet -eq '172' ]
+do 
+      echo "Waiting for API endpoint IP"
+      sleep 10
+      lbIP=`kubectl get svc traefik -n kube-system --kubeconfig config  -o jsonpath="{['status']['loadBalancer']['ingress'][0]['ip']}"`
+      subnet=$(echo $lbIP | awk -F. '{print $1}')
+done
+
 nfsServerIp=`kubectl get svc nfs-server --kubeconfig config  -o jsonpath="{['spec']['clusterIP']}"`
 
 sed -i s/xxx.xxx.xxx.xxx/$nfsServerIp/g kubernates-outline-civo/nfs-pv.yaml
