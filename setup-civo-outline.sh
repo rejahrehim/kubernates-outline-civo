@@ -41,7 +41,7 @@ declare -a openssl_req_flags=(
   -keyout "${SB_PRIVATE_KEY_FILE}"
   -out "${SB_CERTIFICATE_FILE}"
 )
-openssl req "${openssl_req_flags[@]}" > /dev/null 
+openssl req "${openssl_req_flags[@]}" &> /dev/null 
 kubectl create namespace outline --kubeconfig config
 kubectl create secret tls shadowbox-tls -n outline --key ${SB_PRIVATE_KEY_FILE} --cert ${SB_CERTIFICATE_FILE} --kubeconfig config
 
