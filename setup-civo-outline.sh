@@ -5,7 +5,7 @@ clustername=$2
 which curl &> /dev/null && which git &> /dev/null && which openssl &> /dev/null && which kubectl &> /dev/null
 if [ $? -ne 0 ]; then
       echo "Required packages are not installed!"
-      echo "Make sure you have install curl, git, openssl and kubectl"
+      echo "Make sure you have installed curl, git, openssl and kubectl"
       exit 1
 fi
 
