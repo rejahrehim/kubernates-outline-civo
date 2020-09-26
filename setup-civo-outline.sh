@@ -22,7 +22,7 @@ then
 else
       echo $clusterid
       curl -H "Authorization: bearer $token" -X PUT https://api.civo.com/v2/kubernetes/clusters/$clusterid -d applications=Longhorn   &> /dev/null
-      curl -H "Authorization: bearer $token" https://api.civo.com/v2/kubernetes/clusters/$clusterid 2>&1 | grep -oP  \"kubeconfig\":\"[^\"]*admin | awk -F\"kubeconfig\":\" '{print $2}' > config && sed -i 's/\\n/\n/g' config
+      curl -H "Authorization: bearer $token" https://api.civo.com/v2/kubernetes/clusters/$clusterid 2>&1 | grep -oP  \"kubeconfig\":\"[^\"]*admin | awk -F\"kubeconfig\":\" '{print $2}' > /tmp/civo-outline/config && sed -i 's/\\n/\n/g' /tmp/civo-outline/config
 fi
 
 rm -rf cert/ config kubernates-outline-civo/  &> /dev/null
